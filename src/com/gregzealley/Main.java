@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -15,19 +16,50 @@ public class Main {
 
     public static void main(String[] args) {
         //examplesOfStreams();
-        simpleMapReduceStreamExample();
+        //simpleMapReduceStreamExample();
+        examplesOfMatchers();
+        examplesOfFind();
+        examplesOfReduce();
+    }
 
+    private static void examplesOfReduce() {
+
+        List<Person> persons = createListOfPeople();
+
+        //int sumOfAges = persons
+        //        .stream()
+        //        .reduce(0, (p1, p2) -> p1.getAge() + p2.getAge());
+    }
+
+    private static void examplesOfMatchers() {
+        //These are short-circuit terminal operations
+
+        List<Person> persons = createListOfPeople();
+
+        boolean result = persons
+                .stream()
+                .anyMatch(p -> p.getAge() > 20);   //any element match condition
+        //      .allMatch(p -> p.getAge() > 20);   //all elements must match condition
+        //      .noneMatch(p -> p.getAge() > 20);  //no elements must match condition
+
+        System.out.println("Result is: " + (String.valueOf(result)));
+    }
+
+    private static void examplesOfFind() {
+        //might have nothing to return if stream is empty or if no values that match
+        //will return an Optional that can be empty
+
+        List<Person> persons = createListOfPeople();
+
+        Optional<Person> opt = persons
+                .stream()
+                .filter(p -> p.getAge() > 20)
+        //      .findFirst();                   //assumes stream is ordered
+                .findAny();                     //will return any matching
     }
 
     private static void simpleMapReduceStreamExample() {
-        List<Person> persons = new LinkedList<>();
-        Person persona = new Person("Bob", 30);
-        Person personb = new Person("Jim", 19);
-        Person personc = new Person("Carol", 60);
-
-        persons.add(persona);
-        persons.add(personb);
-        persons.add(personc);
+        List<Person> persons = createListOfPeople();
 
         persons.stream()
                 .map(p -> p.getAge())
@@ -53,6 +85,7 @@ public class Main {
         Stream.of("one", "two", "three");
 
         //a constant Stream - call supplier that will always return one.. a constant stream of "one"s
+        // can use .limit to set the number required
         Stream.generate(() -> "one");
 
         //a growing Stream - starts with the parameter, then adds a + onto the next one.. so +, then ++, then +++ forever
@@ -88,5 +121,18 @@ public class Main {
         Stream<String> streamFromBuilder = builder.build(); //now call build method
 
         streamFromBuilder.forEach(System.out::println);
+    }
+
+    private static List<Person> createListOfPeople() {
+        List<Person> persons = new LinkedList<>();
+        Person persona = new Person("Bob", 30);
+        Person personb = new Person("Jim", 19);
+        Person personc = new Person("Carol", 60);
+
+        persons.add(persona);
+        persons.add(personb);
+        persons.add(personc);
+
+        return persons;
     }
 }
